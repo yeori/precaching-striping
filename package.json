@@ -23,13 +23,14 @@
   ],
   "main": "./dist/precache-striping.umd.cjs",
   "module": "./dist/precache-striping.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/precache-striping.js",
       "require": "./dist/precache-striping.umd.cjs"
     }
   },
-  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
