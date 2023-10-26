@@ -1,0 +1,48 @@
+{
+  "name": "precache-striping",
+  "private": true,
+  "version": "0.2.0",
+  "license": "MIT",
+  "author": {
+    "email": "yeori.seo@gmail.com",
+    "name": "Yeori",
+    "url": "https://github.com/yeori"
+  },
+  "type": "module",
+  "description": "Sending concurrent requests with workbox-precaching library",
+  "repository": "yeori/precaching-striping",
+  "keywords": [
+    "workbox",
+    "precaching",
+    "precache",
+    "service worker",
+    "concurrency"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/precache-striping.umd.cjs",
+  "module": "./dist/precache-striping.js",
+  "exports": {
+    ".": {
+      "import": "./dist/precache-striping.js",
+      "require": "./dist/precache-striping.umd.cjs"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.9",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.6.1"
+  },
+  "dependencies": {
+    "workbox-precaching": "^7.0.0",
+    "workbox-routing": "^7.0.0"
+  }
+}
