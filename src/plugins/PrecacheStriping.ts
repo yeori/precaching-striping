@@ -35,7 +35,6 @@ export const splitByBucketSize = (bucketSize: number) =>
     while (offset < size) {
       const limit = offset + chunkSize + (pieces-- > 0 ? 1 : 0);
       const end = Math.min(limit, size);
-      console.log(`[${offset}, ${limit})`);
       yield entries.slice(offset, end);
       offset = end;
     }
