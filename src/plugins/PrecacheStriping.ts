@@ -53,9 +53,9 @@ export class PrecacheStriping {
 
     const leader = new PrecacheController();
     this._sharedCacheKeys = leader.getURLsToCacheKeys();
+    this._bindRouting(leader);
     self.addEventListener("activate", (e) => {
       leader.activate(e);
-      this._bindRouting(leader);
     });
   }
   private _bindRouting(leaderController: PrecacheController) {
