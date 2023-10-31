@@ -1,6 +1,6 @@
 {
   "name": "precache-striping",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "license": "MIT",
   "author": {
     "email": "yeori.seo@gmail.com",
@@ -39,10 +39,12 @@
     "@types/node": "^20.8.9",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
-    "vite-plugin-dts": "^3.6.1"
+    "vite-plugin-dts": "^3.6.1",
+    "workbox-precaching": ">=6.5.0",
+    "workbox-routing": ">=6.5.0"
   },
-  "dependencies": {
-    "workbox-precaching": "^7.0.0",
-    "workbox-routing": "^7.0.0"
+  "peerDependencies": {
+    "workbox-precaching": ">=6.5.0",
+    "workbox-routing": ">=6.5.0"
   }
 }

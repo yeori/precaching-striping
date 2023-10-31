@@ -3,7 +3,28 @@ A module to handle concurrent requests with worbox-precaching
 # 1. Installation
 
 ```bash
-$ npm install precaching-striping
+$ npm install precache-striping
+```
+
+#### Peer Dependencies
+
+You need to install the following dependencies
+
+```json
+{
+  "peerDependencies": {
+    "workbox-precaching": ">=6.5.0",
+    "workbox-routing": ">=6.5.0"
+  }
+}
+```
+
+- `6.5.x` ~ `7.x.x`
+
+If you don't install them, run the fowlling command
+
+```bash
+$ npm install workobx-routing working-precaching
 ```
 
 # 2. How to use it
@@ -52,7 +73,27 @@ controller.precacheStriping(self.__WB_MANIFEST, 6);
 
 If 100 assets are given, each bucket contains 16 or 17 assets
 
-## 2.3. Don't
+## 2.3. Routing Option
+
+If you want pass a custom routing option,
+
+```typescript
+// in sw.js
+import { PrecacheStriping } from "precache-striping";
+import { type PrecacheRouteOptions} from 'workbox-precaching'
+
+const precachController = new PrecacheStriping({
+  optionResolver: () => ({
+    cleanURLs: ...,
+    directoryIndex: ...,
+    ignoreURLParametersMatching: ...,
+    urlManipulation: ...
+  } as PrecacheRouteOptions),
+});
+controller.precacheStriping(self.__WB_MANIFEST);
+```
+
+## 2.4. Don't
 
 You should not use this module in conjunction with the `{ precacheAndRoute, precache }` in `workbox-precaching` module.
 
@@ -84,10 +125,10 @@ controller.precacheStriping(self.__WB_MANIFEST);
 
 const moreAssets: PrecacheEntriy[] = [...]
 // precacheAndRoute(someMoreAssets);
-controller.precach(moreAssets)
+controller.precache(moreAssets)
 ```
 
-## 2.4. cleanupOutdatedCaches
+## 2.5. cleanupOutdatedCaches
 
 `cleanupOutdatedCaches()` in `workbox-precaching` can be used together.
 

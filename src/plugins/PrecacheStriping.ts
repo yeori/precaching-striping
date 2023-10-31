@@ -6,13 +6,25 @@ import {
 } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 
+import { WorkboxPlugin } from "workbox-core";
+
 declare let self: ServiceWorkerGlobalScope;
+/**
+ * declared in workbox-precache.PrecacheController.ts
+ * @type {import { PrecacheControllerOptions } from "workbox-precache/precacheController";}
+ */
+declare interface PrecacheControllerOptions {
+  cacheName?: string;
+  plugins?: WorkboxPlugin[];
+  fallbackToNetwork?: boolean;
+}
 
 export type PrecacheItem = PrecacheEntry | string;
 export type PrecacheOptionConfigurer = () => PrecacheRouteOptions | undefined;
 
 export interface PrecacheStripingOptions {
   optionResolver: PrecacheOptionConfigurer;
+  controllerOptionResolver: () => PrecacheControllerOptions | undefined;
   splitEntries?: (entries: PrecacheItem[]) => Generator<PrecacheItem[]>;
 }
 /**
@@ -42,16 +54,21 @@ export const splitByBucketSize = (bucketSize: number) =>
 
 const DEFAULT_OPTION: PrecacheStripingOptions = {
   optionResolver: () => undefined,
+  controllerOptionResolver: () => undefined, // PrecacheControllerOptions
   splitEntries: undefined,
 };
 
 export class PrecacheStriping {
   private _sharedCacheKeys: Map<string, string>;
   private option: PrecacheStripingOptions | undefined;
+  private _controllerOption: PrecacheControllerOptions | undefined;
   constructor(option?: PrecacheStripingOptions) {
     this.option = option && { ...option };
+    const controllerOptionResolver =
+      option?.controllerOptionResolver || (() => undefined);
+    this._controllerOption = controllerOptionResolver();
 
-    const leader = new PrecacheController();
+    const leader = new PrecacheController(this._controllerOption);
     this._sharedCacheKeys = leader.getURLsToCacheKeys();
     this._bindRouting(leader);
     self.addEventListener("activate", (e) => {
@@ -64,27 +81,26 @@ export class PrecacheStriping {
     registerRoute(new PrecacheRoute(leaderController, optionResolver()));
   }
   precache(entries: PrecacheItem[]) {
-    const installer = new PrecacheController();
+    const installer = new PrecacheController(this._controllerOption);
     /**
      * PrecacheController.precache(...) listens to 'activate' event,
      * which wipes out items loaded by other controllers
      */
     installer.addToCacheList(entries);
+    const keys = installer.getURLsToCacheKeys();
+    // putting all cache keys to leader controller
+    // for cache cleaning on 'activate' event
+    keys.forEach((value, key) => {
+      this._sharedCacheKeys.set(key, value);
+    });
     self.addEventListener("install", (e: ExtendableEvent) =>
-      installer.install(e).then(() => {
-        const keys = installer.getURLsToCacheKeys();
-        // putting all cache keys to leader controller
-        // for cache cleaning on 'activate' event
-        keys.forEach((value, key) => {
-          this._sharedCacheKeys.set(key, value);
-        });
-      })
+      installer.install(e)
     );
   }
   /**
    * starts concurrent precache task.
    * @param entries
-   * @param numOfStriping the number of concurrent precache task
+   * @param numOfStriping (default: 4) the number of concurrent precache task
    */
   precacheStriping(entries: (string | PrecacheEntry)[], numOfStriping = 4) {
     const splitter =
